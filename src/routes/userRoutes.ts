@@ -171,4 +171,7 @@ export function setUserRoutes(app: Router) {
     app.get('/users/:id', authenticateJWT, (req: Request, res: Response, next: NextFunction) => userController.getUser(req, res).catch(next));
     app.put('/users/:id', authenticateJWT, requireAdmin, validateUser, (req: Request, res: Response, next: NextFunction) => userController.updateUser(req, res).catch(next));
     app.delete('/users/:id', authenticateJWT, requireAdmin, (req: Request, res: Response, next: NextFunction) => userController.deleteUser(req, res).catch(next));
+    app.get('/auth/verify', (req: Request, res: Response, next: NextFunction) => userController.verifyEmail(req, res).catch(next));
+    app.post('/auth/request-password-reset', (req: Request, res: Response, next: NextFunction) => userController.requestPasswordReset(req, res).catch(next));
+    app.post('/auth/reset-password', (req: Request, res: Response, next: NextFunction) => userController.resetPassword(req, res).catch(next));
 }

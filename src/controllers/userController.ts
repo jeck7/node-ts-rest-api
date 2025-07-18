@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { createUser, getUser, updateUser, deleteUser, findByEmail, listUsers } from '../services/userService';
+import { createUser, getUser, updateUser, deleteUser, findByEmail, listUsers, verifyUser, generatePasswordResetToken, resetPassword } from '../services/userService';
+import { sendVerificationEmail, sendPasswordResetEmail } from '../utils/mailer';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'changeme';
@@ -13,7 +14,8 @@ class UserController {
         try {
             const { name, email, password, role } = req.body;
             const user = await createUser({ name, email, password, role });
-            res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role });
+            await sendVerificationEmail(user.email, user.verificationToken!);
+            res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, message: 'Please check your email to verify your account.' });
         } catch (error) {
             res.status(400).json({ message: 'Error creating user', error });
         }
@@ -25,6 +27,10 @@ class UserController {
             const user = await findByEmail(email);
             if (!user) {
                 res.status(401).json({ message: 'Invalid credentials' });
+                return;
+            }
+            if (!user.isVerified) {
+                res.status(401).json({ message: 'Please verify your email before logging in.' });
                 return;
             }
             const isMatch = await user.comparePassword(password);
@@ -107,6 +113,56 @@ class UserController {
             }
         } catch (error) {
             res.status(400).json({ message: 'Error updating profile', error });
+        }
+    }
+
+    async verifyEmail(req: Request, res: Response): Promise<void> {
+        try {
+            const { token } = req.query;
+            if (!token || typeof token !== 'string') {
+                res.status(400).json({ message: 'Invalid or missing token' });
+                return;
+            }
+            const user = await verifyUser(token);
+            if (!user) {
+                res.status(400).json({ message: 'Invalid or expired token' });
+                return;
+            }
+            res.status(200).json({ message: 'Email verified successfully!' });
+        } catch (error) {
+            res.status(400).json({ message: 'Error verifying email', error });
+        }
+    }
+
+    async requestPasswordReset(req: Request, res: Response): Promise<void> {
+        try {
+            const { email } = req.body;
+            const user = await generatePasswordResetToken(email);
+            if (user) {
+                await sendPasswordResetEmail(user.email, user.resetPasswordToken!);
+            }
+            // Always return success to prevent email enumeration
+            res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+        } catch (error) {
+            res.status(400).json({ message: 'Error requesting password reset', error });
+        }
+    }
+
+    async resetPassword(req: Request, res: Response): Promise<void> {
+        try {
+            const { token, password } = req.body;
+            if (!token || !password) {
+                res.status(400).json({ message: 'Token and new password are required.' });
+                return;
+            }
+            const user = await resetPassword(token, password);
+            if (!user) {
+                res.status(400).json({ message: 'Invalid or expired token.' });
+                return;
+            }
+            res.status(200).json({ message: 'Password has been reset successfully.' });
+        } catch (error) {
+            res.status(400).json({ message: 'Error resetting password', error });
         }
     }
 }
