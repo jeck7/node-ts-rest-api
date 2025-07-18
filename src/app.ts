@@ -3,12 +3,14 @@
 // npm install --save-dev @types/express @types/body-parser
 import express from 'express';
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import { setUserRoutes } from './routes/userRoutes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
+app.use(cors());
 
 app.use(bodyParser.json());
 setUserRoutes(app);
