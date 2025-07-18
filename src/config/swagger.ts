@@ -10,8 +10,13 @@ const options = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: 'https://node-rest-api-affb.up.railway.app',
+        description: 'Railway Public URL'
       },
+      {
+        url: 'http://localhost:3000',
+        description: 'Local development'
+      }
     ],
   },
   apis: ['src/routes/*.ts', 'src/controllers/*.ts', 'src/types/*.ts'], // files containing annotations
