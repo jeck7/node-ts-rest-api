@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/node-ts-rest-api';
+// const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/node-ts-rest-api';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://mongo:rirxFLLghbYQMoRzpUekWJUJIClIeJva@mongodb.railway.internal:27017';
 
 export const connectDB = async () => {
   try {
