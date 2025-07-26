@@ -15,16 +15,26 @@ import {
   TextField,
   IconButton,
   Tooltip,
+  Alert,
 } from "@mui/material";
-import { Logout, Person, Email, AdminPanelSettings, Edit, Settings, Lock } from "@mui/icons-material";
+import { Logout, Person, Email, AdminPanelSettings, Edit, Settings, Lock, Brightness4, Brightness7 } from "@mui/icons-material";
 import { useLanguage } from "../LanguageContext";
+import { useThemeMode } from "../App";
+import { useTheme } from "@mui/material/styles";
+import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
-export default function Dashboard({ user, onLogout }) {
+export default function Dashboard({ user, onLogout, onUserUpdate }) {
   const [userInfo, setUserInfo] = useState(user);
   const [tab, setTab] = useState(0);
   const [editProfile, setEditProfile] = useState({ name: userInfo?.name || '', email: userInfo?.email || '' });
   const [passwords, setPasswords] = useState({ oldPassword: '', newPassword: '' });
+  const [profileMsg, setProfileMsg] = useState("");
+  const [profileSeverity, setProfileSeverity] = useState("success");
+  const [avatarPreview, setAvatarPreview] = useState(userInfo?.avatarUrl || "");
+  const [avatarMsg, setAvatarMsg] = useState("");
   const { t } = useLanguage();
+  const { mode, toggleTheme } = useThemeMode();
+  const theme = useTheme();
 
   useEffect(() => {
     setUserInfo(user);
@@ -39,15 +49,41 @@ export default function Dashboard({ user, onLogout }) {
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
+    setProfileMsg("");
   };
 
   // Dummy handlers for forms
   const handleProfileChange = (e) => {
     setEditProfile({ ...editProfile, [e.target.name]: e.target.value });
   };
-  const handleProfileSubmit = (e) => {
+  const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    alert(t.profileUpdated);
+    setProfileMsg("");
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:5002/users/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: editProfile.name, email: editProfile.email })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUserInfo(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        onUserUpdate(data); // Обновяваме и App.js state-а
+        setProfileMsg(t.profileUpdated);
+        setProfileSeverity("success");
+      } else {
+        setProfileMsg(data.message || t.registrationError);
+        setProfileSeverity("error");
+      }
+    } catch (err) {
+      setProfileMsg(t.networkError);
+      setProfileSeverity("error");
+    }
   };
   const handlePasswordChange = (e) => {
     setPasswords({ ...passwords, [e.target.name]: e.target.value });
@@ -56,6 +92,49 @@ export default function Dashboard({ user, onLogout }) {
     e.preventDefault();
     alert(t.passwordChanged);
   };
+
+  // Avatar upload handler
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setAvatarMsg("");
+    // Preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatarPreview(reader.result);
+    };
+    reader.readAsDataURL(file);
+    // Upload
+    try {
+      const token = localStorage.getItem('token');
+      const formData = new FormData();
+      formData.append('avatar', file);
+      const res = await fetch("http://localhost:5002/users/me/avatar", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      const data = await res.json();
+      if (res.ok && data.avatarUrl) {
+        setAvatarPreview(data.avatarUrl);
+        setUserInfo((prev) => ({ ...prev, avatarUrl: data.avatarUrl }));
+        localStorage.setItem('user', JSON.stringify({ ...userInfo, avatarUrl: data.avatarUrl }));
+        onUserUpdate({ ...userInfo, avatarUrl: data.avatarUrl });
+        setAvatarMsg(t.profileUpdated);
+      } else {
+        setAvatarMsg(data.message || t.registrationError);
+      }
+    } catch (err) {
+      setAvatarMsg(t.networkError);
+    }
+  };
+
+  const backendUrl = "http://localhost:5002";
+  const avatarSrc = avatarPreview
+    ? avatarPreview.startsWith("/uploads/")
+      ? backendUrl + avatarPreview
+      : avatarPreview
+    : undefined;
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -89,9 +168,29 @@ export default function Dashboard({ user, onLogout }) {
                     bgcolor: 'primary.main',
                     fontSize: '2rem'
                   }}
+                  src={avatarSrc}
                 >
-                  <Person fontSize="large" />
+                  {!avatarSrc && <Person fontSize="large" />}
                 </Avatar>
+                <label htmlFor="avatar-upload">
+                  <input
+                    accept="image/*"
+                    id="avatar-upload"
+                    type="file"
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarChange}
+                  />
+                  <Button
+                    variant="outlined"
+                    component="span"
+                    startIcon={<PhotoCamera />}
+                    size="small"
+                    sx={{ mt: 1, mb: 1 }}
+                  >
+                    {t.uploadAvatar || "Качи снимка"}
+                  </Button>
+                </label>
+                {avatarMsg && <Alert severity="info" sx={{ mt: 1 }}>{avatarMsg}</Alert>}
                 <Typography variant="h6" gutterBottom>
                   {userInfo?.name || t.user}
                 </Typography>
@@ -143,6 +242,9 @@ export default function Dashboard({ user, onLogout }) {
                 <Button type="submit" variant="contained" sx={{ mt: 2 }}>
                   {t.saveChanges}
                 </Button>
+                {profileMsg && (
+                  <Alert severity={profileSeverity} sx={{ mt: 2 }}>{profileMsg}</Alert>
+                )}
               </Box>
             )}
             {tab === 1 && (
@@ -180,17 +282,18 @@ export default function Dashboard({ user, onLogout }) {
                 <Typography variant="body2" color="text.secondary">
                   {t.settingsDesc}
                 </Typography>
+                {/* Превключвателят за тема е премахнат */}
               </Box>
             )}
           </Grid>
         </Grid>
 
         {/* Welcome Message */}
-        <Box sx={{ mt: 4, p: 3, bgcolor: 'grey.50', borderRadius: 2 }}>
-          <Typography variant="h5" gutterBottom>
+        <Box sx={{ mt: 4, p: 3, bgcolor: theme.palette.background.paper, borderRadius: 2 }}>
+          <Typography variant="h5" gutterBottom color={theme.palette.text.primary}>
             {t.hello} {userInfo?.name}! 👋
           </Typography>
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color={theme.palette.text.secondary}>
             {t.loggedIn}
           </Typography>
         </Box>

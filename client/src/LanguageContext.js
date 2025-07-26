@@ -17,8 +17,8 @@ const translations = {
     changePasswordBtn: "Смени паролата",
     settingsTitle: "Настройки",
     settingsDesc: "Тук ще има бъдещи настройки на профила и приложението.",
-    profileUpdated: "Профилът е обновен! (пример)",
-    passwordChanged: "Паролата е сменена! (пример)",
+    profileUpdated: "Профилът е обновен!",
+    passwordChanged: "Паролата е сменена!",
     status: "Статус на акаунта",
     active: "✅ Активен",
     lastLogin: "Последен вход:",
@@ -40,7 +40,9 @@ const translations = {
     loginError: "Грешка при вход.",
     networkError: "Мрежова грешка.",
     switchToEn: "Switch to English",
-    switchToBg: "Превключи на български"
+    switchToBg: "Превключи на български",
+    lightMode: "Светла тема",
+    darkMode: "Тъмна тема"
   },
   en: {
     welcome: "Welcome to Dashboard",
@@ -81,7 +83,9 @@ const translations = {
     loginError: "Login error.",
     networkError: "Network error.",
     switchToEn: "Switch to English",
-    switchToBg: "Switch to Bulgarian"
+    switchToBg: "Switch to Bulgarian",
+    lightMode: "Light mode",
+    darkMode: "Dark mode"
   }
 };
 

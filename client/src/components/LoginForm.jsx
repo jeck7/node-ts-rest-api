@@ -43,19 +43,11 @@ export default function LoginForm({ onLoginSuccess, onSwitchTab }) {
         
         // Запазваме token и user данните
         localStorage.setItem('token', data.token);
-        
-        // Извличаме user данните от token (или ги получаваме от сървъра)
-        // За сега ще използваме email от формата
-        const userData = {
-          email: form.email,
-          name: form.email.split('@')[0], // Временно име от email
-          role: 'user' // По подразбиране
-        };
-        localStorage.setItem('user', JSON.stringify(userData));
+        localStorage.setItem('user', JSON.stringify(data.user));
         
         // Извикваме callback за показване на Dashboard
         if (onLoginSuccess) {
-          onLoginSuccess(userData);
+          onLoginSuccess(data.user);
         }
       } else {
         setMessage(data.message || t.loginError);

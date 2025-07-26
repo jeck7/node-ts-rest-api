@@ -10,6 +10,7 @@ export interface IUser extends Document {
   verificationToken: string | null;
   resetPasswordToken: string | null;
   resetPasswordExpires: Date | null;
+  avatarUrl: string;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -22,6 +23,7 @@ const UserSchema: Schema = new Schema({
   verificationToken: { type: String, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordExpires: { type: Date, default: null },
+  avatarUrl: { type: String, default: "" },
 });
 
 UserSchema.pre<IUser>('save', async function (next) {

@@ -11,7 +11,7 @@ export async function getUser(id: string): Promise<IUser | null> {
   return await User.findById(id).select('-password');
 }
 
-export async function updateUser(id: string, data: { name: string; email: string; role?: string }): Promise<IUser | null> {
+export async function updateUser(id: string, data: { name?: string; email?: string; role?: string; avatarUrl?: string }): Promise<IUser | null> {
   return await User.findByIdAndUpdate(id, data, { new: true }).select('-password');
 }
 

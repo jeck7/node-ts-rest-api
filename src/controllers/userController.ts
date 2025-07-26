@@ -36,7 +36,16 @@ class UserController {
                 return;
             }
             const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
-            res.json({ token });
+            res.json({ 
+                token,
+                user: {
+                    id: user._id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    avatarUrl: user.avatarUrl
+                }
+            });
         } catch (error) {
             res.status(400).json({ message: 'Error logging in', error });
         }

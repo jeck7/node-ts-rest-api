@@ -8,6 +8,7 @@ import { setUserRoutes } from './routes/userRoutes';
 import swaggerUi from 'swagger-ui-express';
 import swaggerSpec from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
+import path from 'path';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use(bodyParser.json());
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 setUserRoutes(app);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(errorHandler);

@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import UserController from '../controllers/userController';
 import { validateUser } from '../middleware/validateUser';
 import { authenticateJWT, requireAdmin } from '../middleware/auth';
+import { uploadAvatar, processUploadedAvatar } from "../middleware/uploadAvatar";
+import { updateUser } from "../services/userService";
 
 const router = Router();
 const userController = new UserController();
@@ -174,4 +176,27 @@ export function setUserRoutes(app: Router) {
     app.get('/auth/verify', (req: Request, res: Response, next: NextFunction) => userController.verifyEmail(req, res).catch(next));
     app.post('/auth/request-password-reset', (req: Request, res: Response, next: NextFunction) => userController.requestPasswordReset(req, res).catch(next));
     app.post('/auth/reset-password', (req: Request, res: Response, next: NextFunction) => userController.resetPassword(req, res).catch(next));
+    app.post(
+      "/users/me/avatar",
+      authenticateJWT,
+      uploadAvatar.single("avatar"),
+      processUploadedAvatar,
+      async (req: Request, res: Response) => {
+        try {
+          const userId = (req as any).user.userId;
+          const file = req.file;
+          if (!file) {
+            return res.status(400).json({ message: "No file uploaded" });
+          }
+          const avatarUrl = `/uploads/avatars/${file.filename}`;
+          const user = await updateUser(userId, { avatarUrl });
+          if (!user) {
+            return res.status(404).json({ message: "User not found" });
+          }
+          res.json({ avatarUrl });
+        } catch (err) {
+          res.status(500).json({ message: "Error uploading avatar" });
+        }
+      }
+    );
 }
