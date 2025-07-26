@@ -100,7 +100,7 @@ function AppContent() {
       <ThemeModeContext.Provider value={{ mode: themeMode, toggleTheme }}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Box sx={{ minHeight: "100vh", bgcolor: "grey.50", position: 'relative' }}>
+          <Box sx={{ minHeight: "100vh", bgcolor: theme.palette.background.default, position: 'relative' }}>
             {LangThemeSwitcher}
             <Dashboard user={user} onLogout={handleLogout} onUserUpdate={handleUserUpdate} />
           </Box>
@@ -114,9 +114,9 @@ function AppContent() {
     <ThemeModeContext.Provider value={{ mode: themeMode, toggleTheme }}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Box sx={{ minHeight: "100vh", bgcolor: "grey.50", py: 4, position: 'relative' }}>
+        <Box sx={{ minHeight: "100vh", bgcolor: theme.palette.background.default, py: 4, position: 'relative' }}>
           {LangThemeSwitcher}
-          <Box sx={{ maxWidth: 380, mx: "auto", bgcolor: "white", borderRadius: 2, boxShadow: 3, p: 2 }}>
+          <Box sx={{ maxWidth: 380, mx: "auto", bgcolor: theme.palette.background.paper, borderRadius: 2, boxShadow: 3, p: 2 }}>
             <Tabs 
               value={activeTab} 
               onChange={handleTabChange} 
