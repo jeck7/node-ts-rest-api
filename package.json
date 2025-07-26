@@ -4,9 +4,9 @@
   "description": "A RESTful API built with Node.js and TypeScript",
   "main": "dist/app.js",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node server/dist/server.js",
     "build": "tsc",
-    "dev": "nodemon --watch src --exec ts-node src/server.ts"
+    "dev": "nodemon --watch src --exec ts-node server/src/server.ts"
   },
   "dependencies": {
     "@types/multer": "^2.0.0",

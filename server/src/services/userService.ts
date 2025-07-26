@@ -47,6 +47,9 @@ export async function generatePasswordResetToken(email: string): Promise<IUser |
   return user;
 }
 
+
+
+
 export async function resetPassword(token: string, newPassword: string): Promise<IUser | null> {
   const user = await User.findOne({
     resetPasswordToken: token,

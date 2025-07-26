@@ -4,7 +4,7 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
 
 ## Project Structure (Updated)
 
-- **backend (Node.js + TypeScript):**
+- **server/ (Backend - Node.js + TypeScript):**
   - src/
     - app.ts: Express app setup
     - server.ts: Entry point (starts the server, auto-creates admin)
@@ -16,12 +16,14 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
     - utils/: Utility/helper functions (image processing, cleanup)
     - types/: TypeScript type definitions
     - config/: Configuration files
-    - uploads/avatars/: Uploaded profile pictures
-- **client (React + Material-UI):**
+  - uploads/avatars/: Uploaded profile pictures
+  - dist/: Compiled JavaScript files
+- **client/ (Frontend - React + Material-UI):**
   - src/
     - components/: UI components (Login, Register, Dashboard, Admin, etc.)
     - LanguageContext.js: Global language context (BG/EN)
     - App.js: Main app logic with theme context
+  - public/: Static assets
 
 ## Setup Instructions
 
@@ -116,7 +118,7 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
 
 ## File Upload & Image Processing
 
-- **Uploaded files are stored in:** `uploads/avatars/`
+- **Uploaded files are stored in:** `server/uploads/avatars/`
 - **Automatic processing:**
   - Resize to 200x200px
   - Crop to square (preserves center)
@@ -187,33 +189,24 @@ curl -X GET http://localhost:5002/admin/avatars/cleanup \
 ### Dashboard (BG)
 ![Dashboard BG](client/public/screenshots/dashboard-bg.png)
 
-[//]: # (### Login/Register &#40;EN&#41;)
+### Login/Register (EN)
+![Login/Register EN](client/public/screenshots/login-en.png)
 
-[//]: # (![Login/Register EN]&#40;client/public/screenshots/login-en.png&#41;)
+### Dashboard (EN)
+![Dashboard EN](client/public/screenshots/dashboard-en.png)
 
-[//]: # ()
-[//]: # (### Dashboard &#40;EN&#41;)
+### Dark Mode
+![Dark Mode](client/public/screenshots/dark-mode.png)
 
-[//]: # (![Dashboard EN]&#40;client/public/screenshots/dashboard-en.png&#41;)
+### Avatar Upload
+![Avatar Upload](client/public/screenshots/avatar-upload.png)
 
-[//]: # ()
-[//]: # (### Dark Mode)
-
-[//]: # (![Dark Mode]&#40;client/public/screenshots/dark-mode.png&#41;)
-
-[//]: # ()
-[//]: # (### Avatar Upload)
-
-[//]: # (![Avatar Upload]&#40;client/public/screenshots/avatar-upload.png&#41;)
-
-[//]: # ()
-[//]: # (### Admin Dashboard)
-
-[//]: # (![Admin Dashboard]&#40;client/public/screenshots/admin-dashboard.png&#41;)
+### Admin Dashboard
+![Admin Dashboard](client/public/screenshots/admin-dashboard.png)
 
 ---
 
-[//]: # (_To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._)
+_To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._
 
 ## Security Note
 
