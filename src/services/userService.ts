@@ -58,4 +58,28 @@ export async function resetPassword(token: string, newPassword: string): Promise
   user.resetPasswordExpires = null;
   await user.save();
   return user;
+}
+
+export async function createAdminUser(): Promise<IUser | null> {
+  try {
+    // Check if admin already exists
+    const existingAdmin = await User.findOne({ role: 'admin' });
+    if (existingAdmin) {
+      return existingAdmin;
+    }
+
+    // Create admin user
+    const adminUser = new User({
+      name: 'Admin',
+      email: 'admin@example.com',
+      password: 'admin123', // Change this in production!
+      role: 'admin',
+      isVerified: true
+    });
+
+    return await adminUser.save();
+  } catch (error) {
+    console.error('Error creating admin user:', error);
+    return null;
+  }
 } 

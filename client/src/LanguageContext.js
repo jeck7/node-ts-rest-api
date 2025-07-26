@@ -42,7 +42,14 @@ const translations = {
     switchToEn: "Switch to English",
     switchToBg: "Превключи на български",
     lightMode: "Светла тема",
-    darkMode: "Тъмна тема"
+    darkMode: "Тъмна тема",
+    adminPanel: "Админ панел",
+    avatarStats: "Статистика за аватари",
+    totalFiles: "Общо файлове",
+    totalSize: "Общ размер",
+    refreshStats: "Обнови статистика",
+    cleanupFiles: "Изчисти неизползвани файлове",
+    cleanupSuccess: "Изчистването завърши успешно! Изтрити {count} файла."
   },
   en: {
     welcome: "Welcome to Dashboard",
@@ -85,7 +92,14 @@ const translations = {
     switchToEn: "Switch to English",
     switchToBg: "Switch to Bulgarian",
     lightMode: "Light mode",
-    darkMode: "Dark mode"
+    darkMode: "Dark mode",
+    adminPanel: "Admin Panel",
+    avatarStats: "Avatar Statistics",
+    totalFiles: "Total Files",
+    totalSize: "Total Size",
+    refreshStats: "Refresh Stats",
+    cleanupFiles: "Cleanup Unused Files",
+    cleanupSuccess: "Cleanup completed! Deleted {count} files."
   }
 };
 

@@ -17,11 +17,10 @@ import {
   Tooltip,
   Alert,
 } from "@mui/material";
-import { Logout, Person, Email, AdminPanelSettings, Edit, Settings, Lock, Brightness4, Brightness7 } from "@mui/icons-material";
+import { Logout, Person, Email, AdminPanelSettings, Edit, Settings, Lock, Brightness4, Brightness7, PhotoCamera, Storage, Delete } from "@mui/icons-material";
 import { useLanguage } from "../LanguageContext";
 import { useThemeMode } from "../App";
 import { useTheme } from "@mui/material/styles";
-import PhotoCamera from "@mui/icons-material/PhotoCamera";
 
 export default function Dashboard({ user, onLogout, onUserUpdate }) {
   const [userInfo, setUserInfo] = useState(user);
@@ -32,6 +31,9 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
   const [profileSeverity, setProfileSeverity] = useState("success");
   const [avatarPreview, setAvatarPreview] = useState(userInfo?.avatarUrl || "");
   const [avatarMsg, setAvatarMsg] = useState("");
+  const [adminStats, setAdminStats] = useState(null);
+  const [adminMsg, setAdminMsg] = useState("");
+  const [adminSeverity, setAdminSeverity] = useState("info");
   const { t } = useLanguage();
   const { mode, toggleTheme } = useThemeMode();
   const theme = useTheme();
@@ -129,6 +131,54 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
     }
   };
 
+  // Admin functions
+  const fetchAdminStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:5002/admin/avatars/stats", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAdminStats(data);
+      } else {
+        setAdminMsg("Error fetching stats");
+        setAdminSeverity("error");
+      }
+    } catch (err) {
+      setAdminMsg(t.networkError);
+      setAdminSeverity("error");
+    }
+  };
+
+  const handleCleanup = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:5002/admin/avatars/cleanup", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setAdminStats(data.after);
+        setAdminMsg(`Cleanup completed! Deleted ${data.deleted} files.`);
+        setAdminSeverity("success");
+      } else {
+        setAdminMsg("Error during cleanup");
+        setAdminSeverity("error");
+      }
+    } catch (err) {
+      setAdminMsg(t.networkError);
+      setAdminSeverity("error");
+    }
+  };
+
+  // Fetch stats when admin tab is opened
+  useEffect(() => {
+    if (tab === 3 && userInfo?.role === 'admin') {
+      fetchAdminStats();
+    }
+  }, [tab, userInfo?.role]);
+
   const backendUrl = "http://localhost:5002";
   const avatarSrc = avatarPreview
     ? avatarPreview.startsWith("/uploads/")
@@ -215,6 +265,9 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
                 <Tab icon={<Edit />} label={t.editProfile} />
                 <Tab icon={<Lock />} label={t.changePassword} />
                 <Tab icon={<Settings />} label={t.settings} />
+                {userInfo?.role === 'admin' && (
+                  <Tab icon={<AdminPanelSettings />} label="Admin" />
+                )}
               </Tabs>
             </Box>
             {/* Tab Content */}
@@ -283,6 +336,64 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
                   {t.settingsDesc}
                 </Typography>
                 {/* Превключвателят за тема е премахнат */}
+              </Box>
+            )}
+            {tab === 3 && userInfo?.role === 'admin' && (
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="h6" gutterBottom>
+                  {t.adminPanel}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                  Manage avatar files and system statistics
+                </Typography>
+                
+                {adminStats && (
+                  <Box sx={{ mt: 3, p: 2, bgcolor: 'background.paper', borderRadius: 1 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {t.avatarStats}
+                    </Typography>
+                    <Grid container spacing={2}>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          {t.totalFiles}
+                        </Typography>
+                        <Typography variant="h4" color="primary">
+                          {adminStats.files}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={6}>
+                        <Typography variant="body2" color="text.secondary">
+                          {t.totalSize}
+                        </Typography>
+                        <Typography variant="h4" color="primary">
+                          {adminStats.size}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
+                
+                <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+                  <Button
+                    variant="outlined"
+                    startIcon={<Storage />}
+                    onClick={fetchAdminStats}
+                  >
+                    {t.refreshStats}
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    startIcon={<Delete />}
+                    onClick={handleCleanup}
+                  >
+                    {t.cleanupFiles}
+                  </Button>
+                </Box>
+                
+                {adminMsg && (
+                  <Alert severity={adminSeverity} sx={{ mt: 2 }}>{adminMsg}</Alert>
+                )}
               </Box>
             )}
           </Grid>

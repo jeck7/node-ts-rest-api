@@ -1,25 +1,25 @@
 # Node.js TypeScript RESTful API + React Client
 
-This project includes a RESTful API built with Node.js and TypeScript, and a modern React client with Material-UI, global language switching (BG/EN), light/dark theme, dashboard with profile picture upload, and user interface for registration and login.
+This project includes a RESTful API built with Node.js and TypeScript, and a modern React client with Material-UI, global language switching (BG/EN), light/dark theme, dashboard with profile picture upload, admin dashboard, and user interface for registration and login.
 
 ## Project Structure (Updated)
 
 - **backend (Node.js + TypeScript):**
   - src/
     - app.ts: Express app setup
-    - server.ts: Entry point (starts the server)
+    - server.ts: Entry point (starts the server, auto-creates admin)
     - controllers/: Route handlers
-    - routes/: Route definitions
-    - services/: Business logic
+    - routes/: Route definitions (admin endpoints included)
+    - services/: Business logic (admin user creation)
     - models/: Database models/schemas
     - middleware/: Express middleware (auth, upload, etc.)
-    - utils/: Utility/helper functions (image processing)
+    - utils/: Utility/helper functions (image processing, cleanup)
     - types/: TypeScript type definitions
     - config/: Configuration files
     - uploads/avatars/: Uploaded profile pictures
 - **client (React + Material-UI):**
   - src/
-    - components/: UI components (Login, Register, Dashboard, etc.)
+    - components/: UI components (Login, Register, Dashboard, Admin, etc.)
     - LanguageContext.js: Global language context (BG/EN)
     - App.js: Main app logic with theme context
 
@@ -47,6 +47,10 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
    npm start
    ```
    - By default, the API runs on port **5002**.
+   - **Admin user is auto-created on server start:**
+     - **Email:** `admin@example.com`
+     - **Password:** `admin123`
+     - **Change this password in production!**
 
 ### Frontend (React Client)
 
@@ -86,6 +90,13 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
   - Tabs: Edit Profile, Change Password, Settings
   - Responsive design
   - Logout
+- **Admin Dashboard (only for admin users):**
+  - **Admin tab** visible only for users with `role: admin`
+  - **Avatar Storage Statistics:**
+    - Total files and total size
+    - Refresh stats button
+    - Cleanup unused files button (deletes orphaned avatars)
+    - All texts are multilingual (BG/EN)
 
 ## API Usage (Updated)
 
@@ -93,6 +104,9 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
 - **Login:** `POST /auth/login`
 - **User operations:** `/users`, `/users/:id` (JWT protected)
 - **Avatar upload:** `POST /users/me/avatar` (multipart/form-data)
+- **Admin endpoints:**
+  - **Avatar stats:** `GET /admin/avatars/stats` (admin only)
+  - **Avatar cleanup:** `GET /admin/avatars/cleanup` (admin only)
 - **Swagger documentation:** [http://localhost:5002/api-docs](http://localhost:5002/api-docs)
 
 ## JWT Authentication
@@ -110,6 +124,8 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
   - Web optimization
 - **Maximum size:** 5MB (before processing)
 - **Supported formats:** All image formats
+- **Old avatars are deleted automatically when a new one is uploaded.**
+- **Unused avatars can be cleaned up via the admin dashboard or API.**
 
 ## Docker Compose
 
@@ -134,6 +150,14 @@ curl -X POST http://localhost:5002/users/me/avatar \
   -H 'Authorization: Bearer YOUR_TOKEN' \
   -F 'avatar=@/path/to/image.jpg'
 # Response: { "avatarUrl": "/uploads/avatars/123456.jpg" }
+
+# Admin: Get avatar stats
+curl -X GET http://localhost:5002/admin/avatars/stats \
+  -H 'Authorization: Bearer ADMIN_TOKEN'
+
+# Admin: Cleanup unused avatars
+curl -X GET http://localhost:5002/admin/avatars/cleanup \
+  -H 'Authorization: Bearer ADMIN_TOKEN'
 ```
 
 ## Technical Details
@@ -175,9 +199,16 @@ curl -X POST http://localhost:5002/users/me/avatar \
 ### Avatar Upload
 ![Avatar Upload](client/public/screenshots/avatar-upload.png)
 
+### Admin Dashboard
+![Admin Dashboard](client/public/screenshots/admin-dashboard.png)
+
 ---
 
 _To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._
+
+## Security Note
+
+**Change the default admin password in production!**
 
 ## License
 

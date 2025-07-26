@@ -3,7 +3,10 @@ import UserController from '../controllers/userController';
 import { validateUser } from '../middleware/validateUser';
 import { authenticateJWT, requireAdmin } from '../middleware/auth';
 import { uploadAvatar, processUploadedAvatar } from "../middleware/uploadAvatar";
-import { updateUser } from "../services/userService";
+import { updateUser, getUser } from "../services/userService";
+import fs from 'fs';
+import path from 'path';
+import { cleanupUnusedAvatars, getAvatarsDiskUsage } from "../utils/cleanupAvatars";
 
 const router = Router();
 const userController = new UserController();
@@ -188,6 +191,17 @@ export function setUserRoutes(app: Router) {
           if (!file) {
             return res.status(400).json({ message: "No file uploaded" });
           }
+
+          // Get current user to check for existing avatar
+          const currentUser = await getUser(userId);
+          if (currentUser && currentUser.avatarUrl) {
+            // Delete old avatar file if it exists
+            const oldAvatarPath = path.join(__dirname, '../../', currentUser.avatarUrl);
+            if (fs.existsSync(oldAvatarPath)) {
+              fs.unlinkSync(oldAvatarPath);
+            }
+          }
+
           const avatarUrl = `/uploads/avatars/${file.filename}`;
           const user = await updateUser(userId, { avatarUrl });
           if (!user) {
@@ -199,4 +213,32 @@ export function setUserRoutes(app: Router) {
         }
       }
     );
+
+    // Admin endpoint for cleaning up unused avatars
+    app.get('/admin/avatars/cleanup', authenticateJWT, requireAdmin, async (req: Request, res: Response) => {
+      try {
+        const beforeStats = getAvatarsDiskUsage();
+        await cleanupUnusedAvatars();
+        const afterStats = getAvatarsDiskUsage();
+        
+        res.json({
+          message: 'Cleanup completed',
+          before: beforeStats,
+          after: afterStats,
+          deleted: beforeStats.files - afterStats.files
+        });
+      } catch (err) {
+        res.status(500).json({ message: 'Error during cleanup' });
+      }
+    });
+
+    // Admin endpoint for getting avatars disk usage
+    app.get('/admin/avatars/stats', authenticateJWT, requireAdmin, async (req: Request, res: Response) => {
+      try {
+        const stats = getAvatarsDiskUsage();
+        res.json(stats);
+      } catch (err) {
+        res.status(500).json({ message: 'Error getting stats' });
+      }
+    });
 }
