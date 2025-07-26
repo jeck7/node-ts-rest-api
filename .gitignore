@@ -25,6 +25,7 @@ Thumbs.db
 
 # Others
 coverage/
+data/
 
 # Optional npm cache directory
 .npm 

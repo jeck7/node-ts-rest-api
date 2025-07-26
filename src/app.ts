@@ -10,7 +10,12 @@ import swaggerSpec from './config/swagger';
 import { errorHandler } from './middleware/errorHandler';
 
 const app = express();
-app.use(cors());
+
+// Настройваме CORS за React приложението
+app.use(cors({
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5003', 'http://localhost:5002'],
+  credentials: true
+}));
 
 app.use(bodyParser.json());
 setUserRoutes(app);

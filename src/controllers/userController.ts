@@ -14,8 +14,9 @@ class UserController {
         try {
             const { name, email, password, role } = req.body;
             const user = await createUser({ name, email, password, role });
-            await sendVerificationEmail(user.email, user.verificationToken!);
-            res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, message: 'Please check your email to verify your account.' });
+            // Премахваме изпращането на имейл за верификация
+            // await sendVerificationEmail(user.email, user.verificationToken!);
+            res.status(201).json({ id: user._id, name: user.name, email: user.email, role: user.role, message: 'Registration successful! You can now log in.' });
         } catch (error) {
             res.status(400).json({ message: 'Error creating user', error });
         }
@@ -27,10 +28,6 @@ class UserController {
             const user = await findByEmail(email);
             if (!user) {
                 res.status(401).json({ message: 'Invalid credentials' });
-                return;
-            }
-            if (!user.isVerified) {
-                res.status(401).json({ message: 'Please verify your email before logging in.' });
                 return;
             }
             const isMatch = await user.comparePassword(password);

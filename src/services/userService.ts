@@ -3,7 +3,7 @@ import crypto from 'crypto';
 
 export async function createUser(user: { name: string; email: string; password: string; role?: string }): Promise<IUser> {
   const verificationToken = crypto.randomBytes(32).toString('hex');
-  const newUser = new User({ ...user, role: user.role || 'user', isVerified: false, verificationToken });
+  const newUser = new User({ ...user, role: user.role || 'user', isVerified: true, verificationToken });
   return await newUser.save();
 }
 
