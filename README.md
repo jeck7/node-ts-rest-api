@@ -187,20 +187,29 @@ curl -X GET http://localhost:5002/admin/avatars/cleanup \
 ### Dashboard (BG)
 ![Dashboard BG](client/public/screenshots/dashboard-bg.png)
 
-### Login/Register (EN)
-![Login/Register EN](client/public/screenshots/login-en.png)
+[//]: # (### Login/Register &#40;EN&#41;)
 
-### Dashboard (EN)
-![Dashboard EN](client/public/screenshots/dashboard-en.png)
+[//]: # (![Login/Register EN]&#40;client/public/screenshots/login-en.png&#41;)
 
-### Dark Mode
-![Dark Mode](client/public/screenshots/dark-mode.png)
+[//]: # ()
+[//]: # (### Dashboard &#40;EN&#41;)
 
-### Avatar Upload
-![Avatar Upload](client/public/screenshots/avatar-upload.png)
+[//]: # (![Dashboard EN]&#40;client/public/screenshots/dashboard-en.png&#41;)
 
-### Admin Dashboard
-![Admin Dashboard](client/public/screenshots/admin-dashboard.png)
+[//]: # ()
+[//]: # (### Dark Mode)
+
+[//]: # (![Dark Mode]&#40;client/public/screenshots/dark-mode.png&#41;)
+
+[//]: # ()
+[//]: # (### Avatar Upload)
+
+[//]: # (![Avatar Upload]&#40;client/public/screenshots/avatar-upload.png&#41;)
+
+[//]: # ()
+[//]: # (### Admin Dashboard)
+
+[//]: # (![Admin Dashboard]&#40;client/public/screenshots/admin-dashboard.png&#41;)
 
 ---
 
