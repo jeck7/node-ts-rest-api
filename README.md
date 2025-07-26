@@ -1,6 +1,6 @@
 # Node.js TypeScript RESTful API + React Client
 
-Този проект включва RESTful API, изграден с Node.js и TypeScript, и модерен React клиент с Material-UI, глобална смяна на език (BG/EN), dashboard и потребителски интерфейс за регистрация и вход.
+This project includes a RESTful API built with Node.js and TypeScript, and a modern React client with Material-UI, global language switching (BG/EN), light/dark theme, dashboard with profile picture upload, and user interface for registration and login.
 
 ## Project Structure (Updated)
 
@@ -12,15 +12,16 @@
     - routes/: Route definitions
     - services/: Business logic
     - models/: Database models/schemas
-    - middleware/: Express middleware
-    - utils/: Utility/helper functions
+    - middleware/: Express middleware (auth, upload, etc.)
+    - utils/: Utility/helper functions (image processing)
     - types/: TypeScript type definitions
     - config/: Configuration files
+    - uploads/avatars/: Uploaded profile pictures
 - **client (React + Material-UI):**
   - src/
     - components/: UI components (Login, Register, Dashboard, etc.)
     - LanguageContext.js: Global language context (BG/EN)
-    - App.js: Main app logic
+    - App.js: Main app logic with theme context
 
 ## Setup Instructions
 
@@ -35,82 +36,126 @@
    npm run build
    ```
 3. **Start MongoDB:**
-   - Локално или с Docker Compose:
+   - Locally or with Docker Compose:
      ```bash
      docker-compose up -d
      ```
 4. **Run the API:**
    ```bash
    npm run dev
-   # или
+   # or
    npm start
    ```
-   - По подразбиране API-то работи на порт **5002**.
+   - By default, the API runs on port **5002**.
 
 ### Frontend (React Client)
 
-1. **Инсталирай зависимостите:**
+1. **Install dependencies:**
    ```bash
    cd client
    npm install
    ```
-2. **Стартирай клиента:**
+2. **Start the client:**
    ```bash
    npm start
    ```
-   - По подразбиране клиентът работи на порт **3000** (или следващ свободен).
+   - By default, the client runs on port **3000** (or next available).
 
-3. **Отвори в браузър:**
+3. **Open in browser:**
    - [http://localhost:3000](http://localhost:3000)
 
-## Основни UI функционалности
+## Main UI Features
 
-- **Глобална смяна на език (BG/EN):**
-  - Бутон горе вдясно за превключване на езика на целия интерфейс
+- **Global language switching (BG/EN):**
+  - Button in the top right to switch the language of the entire interface
+- **Light/Dark theme:**
+  - Global toggle next to the language button
+  - Automatic saving of preferred theme
+  - Adaptive colors for all components
 - **Login/Register:**
-  - Компактни форми с Material-UI
-  - Показване/скриване на паролата
-  - Навигация между вход и регистрация с един клик
+  - Compact forms with Material-UI
+  - Show/hide password functionality
+  - One-click navigation between login and registration
 - **Dashboard:**
-  - Профилна информация, статус, роля
-  - Табове: Редактирай профил, Промени парола, Настройки
-  - Responsive дизайн
-  - Изход (logout)
+  - Profile information, status, role
+  - **Profile picture upload (avatar):**
+    - Upload button under the avatar
+    - Automatic resize and crop to 200x200px
+    - Supports JPEG, PNG, GIF and other formats
+    - Web optimization (85% JPEG quality)
+  - Tabs: Edit Profile, Change Password, Settings
+  - Responsive design
+  - Logout
 
-## API Usage (актуализирано)
+## API Usage (Updated)
 
-- **Регистрация:** `POST /auth/register`
-- **Вход:** `POST /auth/login`
-- **Потребителски операции:** `/users`, `/users/:id` (JWT защита)
-- **Swagger документация:** [http://localhost:5002/api-docs](http://localhost:5002/api-docs)
+- **Registration:** `POST /auth/register`
+- **Login:** `POST /auth/login`
+- **User operations:** `/users`, `/users/:id` (JWT protected)
+- **Avatar upload:** `POST /users/me/avatar` (multipart/form-data)
+- **Swagger documentation:** [http://localhost:5002/api-docs](http://localhost:5002/api-docs)
 
 ## JWT Authentication
 
-- При успешен вход се получава JWT токен, който се пази в localStorage и се използва за достъп до защитени ресурси.
-- Токенът съдържа userId и роля.
+- Upon successful login, a JWT token is received, stored in localStorage, and used to access protected resources.
+- The token contains userId and role.
+
+## File Upload & Image Processing
+
+- **Uploaded files are stored in:** `uploads/avatars/`
+- **Automatic processing:**
+  - Resize to 200x200px
+  - Crop to square (preserves center)
+  - Convert to JPEG format
+  - Web optimization
+- **Maximum size:** 5MB (before processing)
+- **Supported formats:** All image formats
 
 ## Docker Compose
 
-- Можеш да стартираш MongoDB с:
+- You can start MongoDB with:
   ```bash
   docker-compose up -d
   ```
-- Данните се пазят в Docker volume.
+- Data is stored in Docker volume.
 
-## Примерни заявки
+## Example Requests
 
 ```bash
-# Регистрация
+# Registration
 curl -X POST http://localhost:5002/auth/register -H 'Content-Type: application/json' -d '{"name":"Test","email":"test@example.com","password":"testpass"}'
 
-# Вход
+# Login
 curl -X POST http://localhost:5002/auth/login -H 'Content-Type: application/json' -d '{"email":"test@example.com","password":"testpass"}'
-# Response: { "token": "..." }
+# Response: { "token": "...", "user": {...} }
+
+# Avatar upload
+curl -X POST http://localhost:5002/users/me/avatar \
+  -H 'Authorization: Bearer YOUR_TOKEN' \
+  -F 'avatar=@/path/to/image.jpg'
+# Response: { "avatarUrl": "/uploads/avatars/123456.jpg" }
 ```
+
+## Technical Details
+
+### Backend Dependencies
+- **Express.js** - Web framework
+- **Mongoose** - MongoDB ODM
+- **JWT** - Authentication
+- **Multer** - File upload handling
+- **Sharp** - Image processing
+- **CORS** - Cross-origin requests
+- **Swagger** - API documentation
+
+### Frontend Dependencies
+- **React** - UI library
+- **Material-UI (MUI)** - Component library
+- **Context API** - State management (language, theme)
+- **Fetch API** - HTTP requests
 
 ## Screenshots
 
-> **Добави свои скрийншоти в папка `client/public/screenshots/` и ги преименувай, ако желаеш.**
+> **Add your screenshots to the `client/public/screenshots/` folder and rename them if needed.**
 
 ### Login/Register (BG)
 ![Login/Register BG](client/public/screenshots/login-bg.png)
@@ -124,9 +169,15 @@ curl -X POST http://localhost:5002/auth/login -H 'Content-Type: application/json
 ### Dashboard (EN)
 ![Dashboard EN](client/public/screenshots/dashboard-en.png)
 
+### Dark Mode
+![Dark Mode](client/public/screenshots/dark-mode.png)
+
+### Avatar Upload
+![Avatar Upload](client/public/screenshots/avatar-upload.png)
+
 ---
 
-_За да добавиш свои изображения, направи скрийншот, запази го в `client/public/screenshots/` и редактирай имената по-горе, ако е нужно._
+_To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._
 
 ## License
 
