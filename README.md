@@ -213,7 +213,7 @@ curl -X GET http://localhost:5002/admin/avatars/cleanup \
 
 ---
 
-_To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._
+[//]: # (_To add your images, take a screenshot, save it in `client/public/screenshots/` and edit the names above if needed._)
 
 ## Security Note
 
