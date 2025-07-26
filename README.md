@@ -1,148 +1,132 @@
-# Node.js TypeScript RESTful API
+# Node.js TypeScript RESTful API + React Client
 
-This project is a simple RESTful API built with Node.js and TypeScript. It provides user-related operations such as creating, retrieving, updating, and deleting users.
+Този проект включва RESTful API, изграден с Node.js и TypeScript, и модерен React клиент с Material-UI, глобална смяна на език (BG/EN), dashboard и потребителски интерфейс за регистрация и вход.
 
 ## Project Structure (Updated)
 
-- src/
-  - app.ts: Express app setup
-  - server.ts: Entry point (starts the server)
-  - controllers/: Route handlers
-  - routes/: Route definitions
-  - services/: Business logic
-  - models/: Database models/schemas
-  - middleware/: Express middleware
-  - utils/: Utility/helper functions
-  - types/: TypeScript type definitions
-  - config/: Configuration files
-- tests/: Unit and integration tests
+- **backend (Node.js + TypeScript):**
+  - src/
+    - app.ts: Express app setup
+    - server.ts: Entry point (starts the server)
+    - controllers/: Route handlers
+    - routes/: Route definitions
+    - services/: Business logic
+    - models/: Database models/schemas
+    - middleware/: Express middleware
+    - utils/: Utility/helper functions
+    - types/: TypeScript type definitions
+    - config/: Configuration files
+- **client (React + Material-UI):**
+  - src/
+    - components/: UI components (Login, Register, Dashboard, etc.)
+    - LanguageContext.js: Global language context (BG/EN)
+    - App.js: Main app logic
 
 ## Setup Instructions
 
-1. **Clone the repository:**
-   ```
-   git clone <repository-url>
-   cd node-ts-rest-api
-   ```
+### Backend (API)
 
-2. **Install dependencies:**
-   ```
+1. **Install dependencies:**
+   ```bash
    npm install
    ```
-
-3. **Compile TypeScript:**
-   ```
+2. **Compile TypeScript:**
+   ```bash
    npm run build
    ```
-
-4. **Run the application:**
-   ```
+3. **Start MongoDB:**
+   - Локално или с Docker Compose:
+     ```bash
+     docker-compose up -d
+     ```
+4. **Run the API:**
+   ```bash
+   npm run dev
+   # или
    npm start
    ```
+   - По подразбиране API-то работи на порт **5002**.
 
-## API Usage
+### Frontend (React Client)
 
-### Create User
-
-- **Endpoint:** `POST /users`
-- **Request Body:**
-  ```json
-  {
-    "name": "John Doe",
-    "email": "john.doe@example.com"
-  }
-  ```
-
-### Get User
-
-- **Endpoint:** `GET /users/:id`
-
-### Update User
-
-- **Endpoint:** `PUT /users/:id`
-- **Request Body:**
-  ```json
-  {
-    "name": "John Doe Updated",
-    "email": "john.doe.updated@example.com"
-  }
-  ```
-
-### Delete User
-
-- **Endpoint:** `DELETE /users/:id`
-
-## Running with Docker Compose
-
-This project includes a `docker-compose.yml` file to easily run both the Node.js API and MongoDB in containers.
-
-### Prerequisites
-- [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/) installed on your machine.
-
-### Usage
-1. **Build and start the services:**
+1. **Инсталирай зависимостите:**
    ```bash
-   docker-compose up --build
+   cd client
+   npm install
    ```
-   This will start both the API (on port 3000) and MongoDB (on port 27017).
-
-2. **Access the API:**
-   - Open [http://localhost:3000/api-docs](http://localhost:3000/api-docs) for Swagger UI.
-   - The API will connect to MongoDB automatically using the internal Docker network.
-
-3. **Stop the services:**
-   Press `Ctrl+C` in the terminal, then run:
+2. **Стартирай клиента:**
    ```bash
-   docker-compose down
+   npm start
    ```
+   - По подразбиране клиентът работи на порт **3000** (или следващ свободен).
 
-### Data Persistence
-- MongoDB data is stored in a Docker volume (`mongo-data`) so your data persists between restarts.
+3. **Отвори в браузър:**
+   - [http://localhost:3000](http://localhost:3000)
 
-### Customization
-- You can change the exposed ports or environment variables in `docker-compose.yml` as needed.
+## Основни UI функционалности
+
+- **Глобална смяна на език (BG/EN):**
+  - Бутон горе вдясно за превключване на езика на целия интерфейс
+- **Login/Register:**
+  - Компактни форми с Material-UI
+  - Показване/скриване на паролата
+  - Навигация между вход и регистрация с един клик
+- **Dashboard:**
+  - Профилна информация, статус, роля
+  - Табове: Редактирай профил, Промени парола, Настройки
+  - Responsive дизайн
+  - Изход (logout)
+
+## API Usage (актуализирано)
+
+- **Регистрация:** `POST /auth/register`
+- **Вход:** `POST /auth/login`
+- **Потребителски операции:** `/users`, `/users/:id` (JWT защита)
+- **Swagger документация:** [http://localhost:5002/api-docs](http://localhost:5002/api-docs)
 
 ## JWT Authentication
 
-This API uses [JWT (JSON Web Token)](https://jwt.io/) for authentication and authorization.
+- При успешен вход се получава JWT токен, който се пази в localStorage и се използва за достъп до защитени ресурси.
+- Токенът съдържа userId и роля.
 
-### How it works
-1. **Register or Login:**
-   - Register a new user via `POST /auth/register` or login via `POST /auth/login`.
-   - On successful login, you will receive a JWT token in the response.
+## Docker Compose
 
-2. **Using the Token:**
-   - For protected endpoints, include the token in the `Authorization` header:
-     ```
-     Authorization: Bearer <your_jwt_token>
-     ```
-   - You can use the "Authorize" button in Swagger UI to set your token for all requests.
+- Можеш да стартираш MongoDB с:
+  ```bash
+  docker-compose up -d
+  ```
+- Данните се пазят в Docker volume.
 
-3. **Protected Routes:**
-   - Most `/users` endpoints require a valid JWT token.
-   - Some routes (like creating, updating, or deleting users) require the user to have an `admin` role.
+## Примерни заявки
 
-4. **Token Payload:**
-   - The JWT token contains the user's ID and role (e.g., `{ userId: ..., role: 'admin' }`).
-   - The server verifies the token on each request to protected routes.
-
-### Example
 ```bash
-# Register
-curl -X POST http://localhost:3000/auth/register -H 'Content-Type: application/json' -d '{"name":"Test","email":"test@example.com","password":"testpass"}'
+# Регистрация
+curl -X POST http://localhost:5002/auth/register -H 'Content-Type: application/json' -d '{"name":"Test","email":"test@example.com","password":"testpass"}'
 
-# Login
-curl -X POST http://localhost:3000/auth/login -H 'Content-Type: application/json' -d '{"email":"test@example.com","password":"testpass"}'
+# Вход
+curl -X POST http://localhost:5002/auth/login -H 'Content-Type: application/json' -d '{"email":"test@example.com","password":"testpass"}'
 # Response: { "token": "..." }
-
-# Access a protected route
-curl -H "Authorization: Bearer <your_jwt_token>" http://localhost:3000/users/me
 ```
 
-### Notes
-- Tokens expire after 1 hour by default.
-- If you try to access a protected route without a valid token, you will receive a 401 Unauthorized error.
-- If you try to access an admin-only route without the `admin` role, you will receive a 403 Forbidden error.
+## Screenshots
+
+> **Добави свои скрийншоти в папка `client/public/screenshots/` и ги преименувай, ако желаеш.**
+
+### Login/Register (BG)
+![Login/Register BG](client/public/screenshots/login-bg.png)
+
+### Dashboard (BG)
+![Dashboard BG](client/public/screenshots/dashboard-bg.png)
+
+### Login/Register (EN)
+![Login/Register EN](client/public/screenshots/login-en.png)
+
+### Dashboard (EN)
+![Dashboard EN](client/public/screenshots/dashboard-en.png)
+
+---
+
+_За да добавиш свои изображения, направи скрийншот, запази го в `client/public/screenshots/` и редактирай имената по-горе, ако е нужно._
 
 ## License
 
