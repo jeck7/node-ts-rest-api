@@ -5,10 +5,10 @@ export async function processAvatar(inputPath: string, outputPath: string): Prom
   try {
     await sharp(inputPath)
       .resize(200, 200, {
-        fit: 'cover', // Изрязва до квадрат, запазвайки центъра
+        fit: 'cover', // Crop to square, center
         position: 'center'
       })
-      .jpeg({ quality: 85 }) // Оптимизиране за web
+      .jpeg({ quality: 85 }) // Optimize for web
       .toFile(outputPath);
   } catch (error) {
     console.error('Error processing avatar:', error);
