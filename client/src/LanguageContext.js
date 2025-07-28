@@ -106,7 +106,7 @@ const translations = {
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('bg');
+  const [lang, setLang] = useState('en');
   const t = translations[lang];
   const switchLang = () => setLang(l => (l === 'bg' ? 'en' : 'bg'));
   return (

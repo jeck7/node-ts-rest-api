@@ -17,7 +17,7 @@ import {
   Tooltip,
   Alert,
 } from "@mui/material";
-import { Logout, Person, Email, AdminPanelSettings, Edit, Settings, Lock, Brightness4, Brightness7, PhotoCamera, Storage, Delete } from "@mui/icons-material";
+import { Person, Email, AdminPanelSettings, Edit, Settings, Lock, Brightness4, Brightness7, PhotoCamera, Storage, Delete } from "@mui/icons-material";
 import { useLanguage } from "../LanguageContext";
 import { useThemeMode } from "../App";
 import { useTheme } from "@mui/material/styles";
@@ -43,11 +43,7 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
     setEditProfile({ name: user?.name || '', email: user?.email || '' });
   }, [user]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    onLogout();
-  };
+
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -194,14 +190,6 @@ export default function Dashboard({ user, onLogout, onUserUpdate }) {
           <Typography variant="h4" component="h1" color="primary">
             {t.welcome}
           </Typography>
-          <Button
-            variant="outlined"
-            color="error"
-            startIcon={<Logout />}
-            onClick={handleLogout}
-          >
-            {t.logout}
-          </Button>
         </Box>
 
         {/* User Info Card */}

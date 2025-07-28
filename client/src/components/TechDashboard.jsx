@@ -17,7 +17,6 @@ import {
   LinearProgress,
   Paper,
   Tooltip,
-  TextField,
   Tabs,
   Tab,
 } from '@mui/material';
@@ -32,11 +31,11 @@ import {
   DonutLarge,
   Diamond,
   CheckCircle,
-  PhotoCamera,
   Speed,
   Battery90,
   Wifi,
   SignalCellular4Bar,
+  Login,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -49,47 +48,157 @@ import CircularProgress from './CircularProgress';
 import Complications from './Complications';
 import WayfinderFacePreview from './WayfinderFacePreview';
 import ModularFacePreview from './ModularFacePreview';
+import ThemeRankingChart from './ThemeRankingChart';
+import AuthModal from './AuthModal';
+import Dashboard from './Dashboard';
 
 const MotionCard = motion(Card);
 const MotionBox = motion(Box);
 
-// Примерни Apple Watch Ultra теми (preview)
-  const watchThemes = [
-    {
-      name: 'Wayfinder',
-      color: '#ff9500',
-      bg: 'linear-gradient(135deg, #23272b 0%, #ff9500 100%)',
-      desc: 'Adventure-ready, compass, and complications grid.',
-      icon: <WayfinderFacePreview size={160} />,
-    },
+// Apple Watch теми данни (извън компонента)
+const initialWatchThemes = [
   {
+    id: 1,
+    name: 'Wayfinder',
+    color: '#ff9500',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff9500 100%)',
+    desc: 'Adventure-ready, compass, and complications grid.',
+    votes: 156,
+    rank: 1,
+    category: 'Adventure',
+  },
+  {
+    id: 2,
     name: 'Modular',
     color: '#00e5ff',
     bg: 'linear-gradient(135deg, #23272b 0%, #00e5ff 100%)',
     desc: 'Data-rich, customizable complications, digital time.',
-    icon: <ModularFacePreview size={160} />,
+    votes: 142,
+    rank: 2,
+    category: 'Professional',
   },
   {
+    id: 3,
     name: 'Infograph',
     color: '#b388ff',
     bg: 'linear-gradient(135deg, #23272b 0%, #b388ff 100%)',
     desc: 'Max info, circular complications, analog hands.',
-    icon: <DonutLarge sx={{ fontSize: 60, color: '#b388ff' }} />,
+    votes: 98,
+    rank: 3,
+    category: 'Information',
   },
   {
+    id: 4,
     name: 'Bevel',
     color: '#ffb300',
     bg: 'linear-gradient(135deg, #23272b 0%, #ffb300 100%)',
     desc: '3D bevel, bold colors, futuristic look.',
-    icon: <Diamond sx={{ fontSize: 60, color: '#ffb300' }} />,
+    votes: 87,
+    rank: 4,
+    category: 'Design',
+  },
+  {
+    id: 5,
+    name: 'California',
+    color: '#ff6b6b',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff6b6b 100%)',
+    desc: 'Classic analog with modern complications.',
+    votes: 76,
+    rank: 5,
+    category: 'Classic',
+  },
+  {
+    id: 6,
+    name: 'Siri',
+    color: '#4fc3f7',
+    bg: 'linear-gradient(135deg, #23272b 0%, #4fc3f7 100%)',
+    desc: 'Voice-activated, smart suggestions.',
+    votes: 65,
+    rank: 6,
+    category: 'Smart',
   },
 ];
 
-export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuccess, activeTab, setActiveTab }) {
+export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuccess, activeTab, setActiveTab, showDashboard, onDashboardClose }) {
   const { t, lang, switchLang } = useLanguage();
   const { mode, toggleTheme } = useThemeMode();
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
+  
+  // Auth modal state
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  
+  // Listen for custom event to open auth modal
+  useEffect(() => {
+    const handleOpenAuthModal = () => {
+      setAuthModalOpen(true);
+    };
+    
+    window.addEventListener('openAuthModal', handleOpenAuthModal);
+    
+    return () => {
+      window.removeEventListener('openAuthModal', handleOpenAuthModal);
+    };
+  }, []);
+  
+  // Apple Watch теми state
+  const [watchThemes, setWatchThemes] = useState(() => {
+    return initialWatchThemes.map(themeData => ({
+      ...themeData,
+      icon: getThemeIcon(themeData.name, themeData.color)
+    }));
+  });
+  
+  // Функция за генериране на икони според името на темата
+  function getThemeIcon(themeName, color) {
+    switch (themeName) {
+      case 'Wayfinder':
+        return <WayfinderFacePreview size={160} />;
+      case 'Modular':
+        return <ModularFacePreview size={160} />;
+      case 'Infograph':
+        return <DonutLarge sx={{ fontSize: 60, color: color }} />;
+      case 'Bevel':
+        return <Diamond sx={{ fontSize: 60, color: color }} />;
+      case 'California':
+        return <Watch sx={{ fontSize: 60, color: color }} />;
+      case 'Siri':
+        return <Speed sx={{ fontSize: 60, color: color }} />;
+      default:
+        return <Watch sx={{ fontSize: 60, color: color }} />;
+    }
+  }
+  
+  // Функции за гласуване и класация
+  const handleVote = (themeId) => {
+    setWatchThemes(prevThemes => {
+      const updatedThemes = prevThemes.map(theme => 
+        theme.id === themeId 
+          ? { ...theme, votes: theme.votes + 1 }
+          : theme
+      );
+      
+      // Сортиране по гласове и обновяване на ранговете
+      const sortedThemes = updatedThemes.sort((a, b) => b.votes - a.votes);
+      return sortedThemes.map((theme, index) => ({
+        ...theme,
+        rank: index + 1
+      }));
+    });
+  };
+
+  const getSortedThemes = (sortBy = 'rank') => {
+    switch (sortBy) {
+      case 'votes':
+        return [...watchThemes].sort((a, b) => b.votes - a.votes);
+      case 'name':
+        return [...watchThemes].sort((a, b) => a.name.localeCompare(b.name));
+      case 'category':
+        return [...watchThemes].sort((a, b) => a.category.localeCompare(b.category));
+      default:
+        return watchThemes;
+    }
+  };
   const [stats, setStats] = useState({
     projects: 12,
     teamMembers: 8,
@@ -128,14 +237,7 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
     },
   ]);
 
-  const [techStack] = useState([
-    { name: 'React', color: '#61dafb' },
-    { name: 'Node.js', color: '#68a063' },
-    { name: 'MongoDB', color: '#4db33d' },
-    { name: 'TypeScript', color: '#3178c6' },
-    { name: 'Material-UI', color: '#0081cb' },
-    { name: 'Express', color: '#000000' },
-  ]);
+
 
   const [complications] = useState([
     {
@@ -177,12 +279,7 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
     { name: 'Jun', users: 239, revenue: 3800 },
   ];
 
-  const [editName, setEditName] = useState(user?.name || '');
-  const [avatarPreview, setAvatarPreview] = useState(user?.avatarUrl ? `${process.env.REACT_APP_API_URL || 'http://localhost:5002'}${user.avatarUrl}` : '');
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [msg, setMsg] = useState('');
-  const [severity, setSeverity] = useState('success');
-  const [loading, setLoading] = useState(false);
+
 
   const isLoggedIn = !!(user && user.email);
 
@@ -207,61 +304,7 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
     },
   };
 
-  // Актуализиране на аватар при избор
-  const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setAvatarFile(file);
-      setAvatarPreview(URL.createObjectURL(file));
-    }
-  };
 
-  // Запис на профила
-  const handleProfileSave = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMsg('');
-    try {
-      // Update name
-      const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:5002/users/me', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: editName }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Error updating profile');
-      // Update avatar if selected
-      let avatarUrl = data.avatarUrl || user.avatarUrl;
-      if (avatarFile) {
-        const formData = new FormData();
-        formData.append('avatar', avatarFile);
-        const avatarRes = await fetch('http://localhost:5002/users/me/avatar', {
-          method: 'POST',
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        });
-        const avatarData = await avatarRes.json();
-        if (!avatarRes.ok) throw new Error(avatarData.message || 'Error uploading avatar');
-        avatarUrl = avatarData.avatarUrl;
-        setAvatarPreview(`${process.env.REACT_APP_API_URL || 'http://localhost:5002'}${avatarUrl}`);
-      }
-      setMsg('Profile updated!');
-      setSeverity('success');
-      setLoading(false);
-      // Update user in parent
-      onUserUpdate && onUserUpdate({ ...user, name: editName, avatarUrl });
-      // Update localStorage
-      localStorage.setItem('user', JSON.stringify({ ...user, name: editName, avatarUrl }));
-    } catch (err) {
-      setMsg(err.message);
-      setSeverity('error');
-      setLoading(false);
-    }
-  };
 
   return (
     <Box
@@ -309,148 +352,246 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
                     Inspired by Apple Watch Ultra complications & faces
                   </Typography>
                 </Box>
-                {/* Removed New Project and Deploy buttons */}
+                
+
               </Box>
             </MotionBox>
 
-            {/* Apple Watch Ultra Themes Preview */}
+            {/* Apple Watch Themes Tabs */}
             <MotionBox variants={cardVariants} sx={{ mb: 4 }}>
-              <Typography variant="h5" sx={{ mb: 3, color: 'text.primary', fontWeight: 600, fontSize: { xs: '1.1rem', md: '1.3rem' } }}>
-                Apple Watch Ultra Themes
-              </Typography>
-              <Box sx={{
-                display: 'grid',
-                gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr 1fr' },
-                gap: 3,
-                justifyContent: 'center',
-                alignItems: 'stretch',
-              }}>
-                {watchThemes.map((theme, idx) => (
-                  <Box
-                    key={theme.name}
-                    sx={{
-                      background: theme.bg,
-                      borderRadius: 4,
-                      boxShadow: `0 4px 24px ${theme.color}33`,
-                      p: 3,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      minHeight: 180,
-                      border: `2px solid ${theme.color}55`,
-                      transition: 'transform 0.2s',
-                      '&:hover': {
-                        transform: 'scale(1.04)',
-                        boxShadow: `0 8px 32px ${theme.color}66`,
-                      },
-                    }}
-                  >
-                    {theme.icon}
-                    <Typography variant="h5" sx={{ mt: 1, mb: 1, color: theme.color, fontWeight: 700, letterSpacing: '-0.02em' }}>{theme.name}</Typography>
-                    <Typography variant="body1" color="#fff" sx={{ textAlign: 'center', opacity: 0.9, fontSize: '1rem' }}>{theme.desc}</Typography>
-                  </Box>
-                ))}
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                <Typography variant="h5" sx={{ color: 'text.primary', fontWeight: 600, fontSize: { xs: '1.1rem', md: '1.3rem' } }}>
+                  🏆 Apple Watch Themes
+                </Typography>
+                <Chip 
+                  label={`${watchThemes.reduce((sum, theme) => sum + theme.votes, 0)} total votes`}
+                  color="primary"
+                  variant="outlined"
+                />
               </Box>
-            </MotionBox>
-
-
-
-            {/* Tech Stack */}
-            <MotionBox variants={cardVariants} sx={{ mt: 4 }}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h5" sx={{ mb: 3 }}>
-                    Tech Stack
+              
+              {/* Tabs for different views */}
+              <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+                <Tabs 
+                  value={activeTab} 
+                  onChange={(e, v) => setActiveTab(v)} 
+                  sx={{ 
+                    '& .MuiTab-root': { 
+                      color: 'text.secondary',
+                      fontWeight: 600,
+                    },
+                    '& .Mui-selected': { 
+                      color: '#00d4ff',
+                    },
+                  }}
+                >
+                  <Tab label="📊 Ranking Chart" />
+                  <Tab label="🎨 All Themes" />
+                  <Tab label="📈 Statistics" />
+                </Tabs>
+              </Box>
+              
+              {/* Tab Content */}
+              {activeTab === 0 && (
+                <ThemeRankingChart themes={watchThemes} onVote={handleVote} />
+              )}
+              
+              {activeTab === 1 && (
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'text.primary', fontWeight: 600 }}>
+                    All Apple Watch Themes
                   </Typography>
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                    {techStack.map((tech, index) => (
-                      <Chip
-                        key={index}
-                        label={tech.name}
+                  <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' },
+                    gap: 3,
+                    justifyContent: 'center',
+                    alignItems: 'stretch',
+                  }}>
+                    {watchThemes.map((theme, idx) => (
+                      <Box
+                        key={theme.id}
                         sx={{
-                          bgcolor: `${tech.color}20`,
-                          color: tech.color,
-                          border: `1px solid ${tech.color}40`,
+                          background: theme.bg,
+                          borderRadius: 4,
+                          boxShadow: `0 4px 24px ${theme.color}33`,
+                          p: 3,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          minHeight: 200,
+                          border: `2px solid ${theme.color}55`,
+                          transition: 'transform 0.2s',
+                          position: 'relative',
                           '&:hover': {
-                            bgcolor: `${tech.color}30`,
+                            transform: 'scale(1.04)',
+                            boxShadow: `0 8px 32px ${theme.color}66`,
                           },
                         }}
-                      />
+                      >
+                        {/* Rank Badge */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
+                            right: 12,
+                            width: 32,
+                            height: 32,
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: theme.rank <= 3 ? `linear-gradient(135deg, ${theme.color} 0%, ${theme.color}80 100%)` : '#333',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: '0.9rem',
+                            boxShadow: theme.rank <= 3 ? `0 2px 8px ${theme.color}66` : 'none',
+                          }}
+                        >
+                          #{theme.rank}
+                        </Box>
+                        
+                        {theme.icon}
+                        <Typography variant="h5" sx={{ mt: 1, mb: 1, color: theme.color, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                          {theme.name}
+                        </Typography>
+                        <Typography variant="body1" color="#fff" sx={{ textAlign: 'center', opacity: 0.9, fontSize: '0.9rem', mb: 2 }}>
+                          {theme.desc}
+                        </Typography>
+                        
+                        {/* Vote Section */}
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 'auto' }}>
+                          <Chip 
+                            label={`${theme.votes} votes`}
+                            size="small"
+                            sx={{ 
+                              backgroundColor: `${theme.color}30`,
+                              color: theme.color,
+                              fontWeight: 600,
+                            }}
+                          />
+                          <Button
+                            variant="contained"
+                            size="small"
+                            onClick={() => handleVote(theme.id)}
+                            sx={{
+                              backgroundColor: theme.color,
+                              '&:hover': {
+                                backgroundColor: theme.color,
+                                transform: 'scale(1.05)',
+                              },
+                            }}
+                          >
+                            Vote
+                          </Button>
+                        </Box>
+                      </Box>
                     ))}
                   </Box>
-                </CardContent>
-              </Card>
+                </Box>
+              )}
+              
+              {activeTab === 2 && (
+                <Box>
+                  <Typography variant="h6" sx={{ mb: 2, color: 'text.primary', fontWeight: 600 }}>
+                    Detailed Statistics
+                  </Typography>
+                  <Grid container spacing={3}>
+                    <Grid item xs={12} md={6}>
+                      <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)', border: '1px solid #333' }}>
+                        <Typography variant="h6" sx={{ mb: 2, color: '#fff', fontWeight: 600 }}>
+                          Category Distribution
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                          {Object.entries(
+                            watchThemes.reduce((acc, theme) => {
+                              acc[theme.category] = (acc[theme.category] || 0) + theme.votes;
+                              return acc;
+                            }, {})
+                          ).map(([category, votes]) => (
+                            <Box key={category} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Typography variant="body2" sx={{ color: '#ccc' }}>{category}</Typography>
+                              <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{votes} votes</Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Paper>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                      <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)', border: '1px solid #333' }}>
+                        <Typography variant="h6" sx={{ mb: 2, color: '#fff', fontWeight: 600 }}>
+                          Top Performers
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                          {getSortedThemes('votes').slice(0, 5).map((theme, index) => (
+                            <Box key={theme.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Typography variant="body2" sx={{ color: theme.color, fontWeight: 600 }}>
+                                  #{index + 1}
+                                </Typography>
+                                <Typography variant="body2" sx={{ color: '#ccc' }}>{theme.name}</Typography>
+                              </Box>
+                              <Typography variant="body2" sx={{ color: '#fff', fontWeight: 600 }}>{theme.votes} votes</Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Paper>
+                    </Grid>
+                  </Grid>
+                </Box>
+              )}
             </MotionBox>
 
-            {/* Секция за редакция на профила */}
-            {user && user.email && (
-              <Box sx={{ mt: 4, maxWidth: 400, mx: 'auto' }}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ mb: 2 }}>Edit Profile</Typography>
-                    {msg && <Box sx={{ mb: 2 }}><Typography color={severity === 'success' ? 'success.main' : 'error.main'}>{msg}</Typography></Box>}
-                    <form onSubmit={handleProfileSave}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
-                          <Avatar src={avatarPreview} sx={{ width: 80, height: 80, mb: 1 }} />
-                          <label htmlFor="avatar-upload">
-                            <input
-                              accept="image/*"
-                              id="avatar-upload"
-                              type="file"
-                              style={{ display: 'none' }}
-                              onChange={handleAvatarChange}
-                            />
-                            <Button variant="outlined" component="span" startIcon={<PhotoCamera />} size="small">
-                              Upload Photo
-                            </Button>
-                          </label>
-                        </Box>
-                        <TextField
-                          name="name"
-                          label="Name"
-                          value={editName}
-                          onChange={e => setEditName(e.target.value)}
-                          fullWidth
-                        />
-                        <TextField
-                          label="Email"
-                          value={user?.email || ''}
-                          fullWidth
-                          InputProps={{ readOnly: true }}
-                        />
-                        <TextField
-                          label="Role"
-                          value={user?.role || ''}
-                          fullWidth
-                          InputProps={{ readOnly: true }}
-                        />
-                        <Button type="submit" variant="contained" disabled={loading}>{loading ? 'Saving...' : 'Save'}</Button>
-                      </Box>
-                    </form>
-                  </CardContent>
-                </Card>
-              </Box>
-            )}
+
+
+
+
+
           </MotionBox>
         </Container>
       </Box>
 
-      {/* Дясна част: Login/Register форми */}
-      {!isLoggedIn && (
-        <Box sx={{ width: { xs: '100%', md: 400 }, maxWidth: 420, ml: { md: 4 }, mr: { md: 4 }, mt: { xs: 4, md: 8 }, alignSelf: { md: 'flex-start' }, bgcolor: 'background.paper', borderRadius: 2, boxShadow: 3, p: 2 }}>
-          <Tabs 
-            value={activeTab} 
-            onChange={(e, v) => setActiveTab(v)} 
-            centered 
-            sx={{ borderBottom: 1, borderColor: "divider" }}
+      {/* Auth Modal */}
+      <AuthModal 
+        open={authModalOpen} 
+        onClose={() => setAuthModalOpen(false)}
+        onLoginSuccess={onLoginSuccess}
+      />
+      
+      {/* Dashboard Modal */}
+      {showDashboard && (
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 3000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            p: 2,
+          }}
+          onClick={onDashboardClose}
+        >
+          <Box
+            sx={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              backgroundColor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: 24,
+            }}
+            onClick={(e) => e.stopPropagation()}
           >
-            <Tab label="Login" />
-            <Tab label="Register" />
-          </Tabs>
-          <Box sx={{ p: 2 }}>
-            {activeTab === 0 && <LoginForm onLoginSuccess={onLoginSuccess} onSwitchTab={() => setActiveTab(1)} />}
-            {activeTab === 1 && <RegisterForm onSwitchTab={() => setActiveTab(0)} />}
+            <Dashboard 
+              user={user} 
+              onLogout={onLogout} 
+              onUserUpdate={onUserUpdate}
+            />
           </Box>
         </Box>
       )}
