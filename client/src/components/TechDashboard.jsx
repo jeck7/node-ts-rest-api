@@ -36,6 +36,7 @@ import {
   Wifi,
   SignalCellular4Bar,
   Login,
+  Brightness7,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
@@ -117,6 +118,66 @@ const initialWatchThemes = [
     rank: 6,
     category: 'Smart',
   },
+  {
+    id: 7,
+    name: 'Solar',
+    color: '#ffd700',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ffd700 100%)',
+    desc: 'Dynamic solar animation, time-based complications.',
+    votes: 58,
+    rank: 7,
+    category: 'Nature',
+  },
+  {
+    id: 8,
+    name: 'Chronograph',
+    color: '#ff4757',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff4757 100%)',
+    desc: 'Professional stopwatch with tachymeter scale.',
+    votes: 52,
+    rank: 8,
+    category: 'Sports',
+  },
+  {
+    id: 9,
+    name: 'Activity Digital',
+    color: '#2ed573',
+    bg: 'linear-gradient(135deg, #23272b 0%, #2ed573 100%)',
+    desc: 'Fitness-focused with activity rings and metrics.',
+    votes: 48,
+    rank: 9,
+    category: 'Fitness',
+  },
+  {
+    id: 10,
+    name: 'Nike',
+    color: '#ff6b35',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff6b35 100%)',
+    desc: 'Nike-branded with bold typography and colors.',
+    votes: 45,
+    rank: 10,
+    category: 'Sports',
+  },
+  {
+    id: 11,
+    name: 'Hermès',
+    color: '#8b4513',
+    bg: 'linear-gradient(135deg, #23272b 0%, #8b4513 100%)',
+    desc: 'Luxury leather-inspired with elegant complications.',
+    votes: 42,
+    rank: 11,
+    category: 'Luxury',
+  },
+  {
+    id: 12,
+    name: 'Memoji',
+    color: '#ff69b4',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff69b4 100%)',
+    desc: 'Personalized with animated Memoji characters.',
+    votes: 38,
+    rank: 12,
+    category: 'Personal',
+  },
 ];
 
 export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuccess, activeTab, setActiveTab, showDashboard, onDashboardClose }) {
@@ -164,6 +225,18 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
         return <Watch sx={{ fontSize: 60, color: color }} />;
       case 'Siri':
         return <Speed sx={{ fontSize: 60, color: color }} />;
+      case 'Solar':
+        return <Brightness7 sx={{ fontSize: 60, color: color }} />;
+      case 'Chronograph':
+        return <TableChart sx={{ fontSize: 60, color: color }} />;
+      case 'Activity Digital':
+        return <TrendingUp sx={{ fontSize: 60, color: color }} />;
+      case 'Nike':
+        return <Speed sx={{ fontSize: 60, color: color }} />;
+      case 'Hermès':
+        return <Diamond sx={{ fontSize: 60, color: color }} />;
+      case 'Memoji':
+        return <People sx={{ fontSize: 60, color: color }} />;
       default:
         return <Watch sx={{ fontSize: 60, color: color }} />;
     }
