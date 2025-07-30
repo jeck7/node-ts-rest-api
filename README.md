@@ -1,6 +1,6 @@
 # Node.js TypeScript RESTful API + React Client
 
-This project includes a RESTful API built with Node.js and TypeScript, and a modern React client with Material-UI, global language switching (BG/EN), light/dark theme, dashboard with profile picture upload, admin dashboard, and user interface for registration and login.
+This project includes a RESTful API built with Node.js and TypeScript, and a modern React client with Material-UI, global language switching (BG/EN), light/dark theme, dashboard with profile picture upload, admin dashboard, and user interface for registration and login. **Now featuring Apple Watch themes from WCH App and Facer.io!**
 
 ## Project Structure (Updated)
 
@@ -20,10 +20,40 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
   - dist/: Compiled JavaScript files
 - **client/ (Frontend - React + Material-UI):**
   - src/
-    - components/: UI components (Login, Register, Dashboard, Admin, etc.)
+    - components/: UI components (Login, Register, Dashboard, Admin, TechDashboard, etc.)
     - LanguageContext.js: Global language context (BG/EN)
     - App.js: Main app logic with theme context
+    - theme/: Custom themes (techTheme, watchTheme, bevelTheme)
   - public/: Static assets
+
+## 🍎 Apple Watch Themes Integration
+
+### Featured Watch Faces
+The application now includes a comprehensive collection of Apple Watch themes from the most popular customization platforms:
+
+#### **From [WCH App](https://wchapp.com/):**
+- **Infograph Modular** - Data-rich modular face with customizable complications
+- **California** - Classic analog design with modern complications  
+- **Solar** - Dynamic solar animation with time-based complications
+- **Chronograph** - Precision chronograph with stopwatch functionality
+- **Activity Digital** - Fitness-focused with activity rings and metrics
+- **Memoji** - Personalized with animated Memoji characters
+- **Nike Digital** - Nike-inspired with bold typography and colors
+- **Hermès** - Luxury leather-inspired with elegant complications
+
+#### **From [Facer.io](https://www.facer.io/):**
+- **Minimalist** - Clean, minimal design with essential information
+- **Retro Digital** - Vintage digital watch aesthetic with modern features
+- **Weather Pro** - Weather-focused with detailed forecasts and conditions
+- **Gaming** - Gaming-inspired with pixel art and neon effects
+
+### TechDashboard Features
+- **Interactive voting system** - Users can vote for their favorite watch faces
+- **Real-time rankings** - Dynamic ranking based on user votes
+- **Source badges** - Visual indicators showing the origin platform (WCH App/Facer.io)
+- **Category filtering** - Filter themes by category (Professional, Classic, Sports, etc.)
+- **Responsive design** - Optimized for all screen sizes
+- **Theme previews** - Custom icons for each watch face type
 
 ## Setup Instructions
 
@@ -82,6 +112,12 @@ This project includes a RESTful API built with Node.js and TypeScript, and a mod
   - Compact forms with Material-UI
   - Show/hide password functionality
   - One-click navigation between login and registration
+- **TechDashboard (Main Interface):**
+  - **Apple Watch themes showcase** with voting system
+  - **Real-time rankings** and category filtering
+  - **Interactive theme cards** with source badges
+  - **Responsive grid layout** for optimal viewing
+  - **Theme previews** with custom icons
 - **Dashboard:**
   - Profile information, status, role
   - **Profile picture upload (avatar):**
@@ -178,6 +214,15 @@ curl -X GET http://localhost:5002/admin/avatars/cleanup \
 - **Material-UI (MUI)** - Component library
 - **Context API** - State management (language, theme)
 - **Fetch API** - HTTP requests
+- **Framer Motion** - Animations
+- **Recharts** - Data visualization
+
+## 🎨 Theme Sources
+
+This application showcases watch faces from the most popular Apple Watch customization platforms:
+
+- **[WCH App](https://wchapp.com/)** - Ultimate Apple Watch customization platform
+- **[Facer.io](https://www.facer.io/)** - Leading smartwatch customization platform
 
 ## Screenshots
 
