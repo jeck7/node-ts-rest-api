@@ -3,186 +3,170 @@ import {
   Box,
   Container,
   Grid,
-  Card,
-  CardContent,
   Typography,
   Button,
   Chip,
-  Avatar,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemAvatar,
-  IconButton,
-  LinearProgress,
   Paper,
-  Tooltip,
   Tabs,
   Tab,
 } from '@mui/material';
 import {
-  Rocket,
-  Code,
   People,
   TrendingUp,
   Watch,
-  CompassCalibration,
   TableChart,
   DonutLarge,
   Diamond,
-  CheckCircle,
   Speed,
-  Battery90,
-  Wifi,
-  SignalCellular4Bar,
-  Login,
   Brightness7,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
-import { useLanguage } from '../LanguageContext';
-import { useThemeMode } from '../App';
-import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
 import { useTheme } from '@mui/material/styles';
-import CircularProgress from './CircularProgress';
-import Complications from './Complications';
 import WayfinderFacePreview from './WayfinderFacePreview';
 import ModularFacePreview from './ModularFacePreview';
 import ThemeRankingChart from './ThemeRankingChart';
 import AuthModal from './AuthModal';
 import Dashboard from './Dashboard';
 
-const MotionCard = motion(Card);
 const MotionBox = motion(Box);
 
-// Apple Watch теми данни (извън компонента)
+// Apple Watch теми данни от WCH App и Facer.io
 const initialWatchThemes = [
   {
     id: 1,
-    name: 'Wayfinder',
+    name: 'Infograph Modular',
     color: '#ff9500',
     bg: 'linear-gradient(135deg, #23272b 0%, #ff9500 100%)',
-    desc: 'Adventure-ready, compass, and complications grid.',
+    desc: 'Data-rich modular face with customizable complications.',
     votes: 156,
     rank: 1,
-    category: 'Adventure',
+    category: 'Professional',
+    source: 'WCH App'
   },
   {
     id: 2,
-    name: 'Modular',
+    name: 'California',
     color: '#00e5ff',
     bg: 'linear-gradient(135deg, #23272b 0%, #00e5ff 100%)',
-    desc: 'Data-rich, customizable complications, digital time.',
+    desc: 'Classic analog design with modern complications.',
     votes: 142,
     rank: 2,
-    category: 'Professional',
+    category: 'Classic',
+    source: 'WCH App'
   },
   {
     id: 3,
-    name: 'Infograph',
+    name: 'Solar',
     color: '#b388ff',
     bg: 'linear-gradient(135deg, #23272b 0%, #b388ff 100%)',
-    desc: 'Max info, circular complications, analog hands.',
+    desc: 'Dynamic solar animation with time-based complications.',
     votes: 98,
     rank: 3,
-    category: 'Information',
+    category: 'Dynamic',
+    source: 'WCH App'
   },
   {
     id: 4,
-    name: 'Bevel',
+    name: 'Chronograph',
     color: '#ffb300',
     bg: 'linear-gradient(135deg, #23272b 0%, #ffb300 100%)',
-    desc: '3D bevel, bold colors, futuristic look.',
+    desc: 'Precision chronograph with stopwatch functionality.',
     votes: 87,
     rank: 4,
-    category: 'Design',
+    category: 'Sports',
+    source: 'WCH App'
   },
   {
     id: 5,
-    name: 'California',
+    name: 'Activity Digital',
     color: '#ff6b6b',
     bg: 'linear-gradient(135deg, #23272b 0%, #ff6b6b 100%)',
-    desc: 'Classic analog with modern complications.',
+    desc: 'Fitness-focused with activity rings and metrics.',
     votes: 76,
     rank: 5,
-    category: 'Classic',
+    category: 'Fitness',
+    source: 'WCH App'
   },
   {
     id: 6,
-    name: 'Siri',
+    name: 'Memoji',
     color: '#4fc3f7',
     bg: 'linear-gradient(135deg, #23272b 0%, #4fc3f7 100%)',
-    desc: 'Voice-activated, smart suggestions.',
+    desc: 'Personalized with animated Memoji characters.',
     votes: 65,
     rank: 6,
-    category: 'Smart',
+    category: 'Personal',
+    source: 'WCH App'
   },
   {
     id: 7,
-    name: 'Solar',
-    color: '#ffd700',
-    bg: 'linear-gradient(135deg, #23272b 0%, #ffd700 100%)',
-    desc: 'Dynamic solar animation, time-based complications.',
-    votes: 58,
+    name: 'Nike Digital',
+    color: '#4caf50',
+    bg: 'linear-gradient(135deg, #23272b 0%, #4caf50 100%)',
+    desc: 'Nike-inspired with bold typography and colors.',
+    votes: 54,
     rank: 7,
-    category: 'Nature',
+    category: 'Sports',
+    source: 'WCH App'
   },
   {
     id: 8,
-    name: 'Chronograph',
-    color: '#ff4757',
-    bg: 'linear-gradient(135deg, #23272b 0%, #ff4757 100%)',
-    desc: 'Professional stopwatch with tachymeter scale.',
-    votes: 52,
+    name: 'Hermès',
+    color: '#af52de',
+    bg: 'linear-gradient(135deg, #23272b 0%, #af52de 100%)',
+    desc: 'Luxury leather-inspired with elegant complications.',
+    votes: 43,
     rank: 8,
-    category: 'Sports',
+    category: 'Luxury',
+    source: 'WCH App'
   },
   {
     id: 9,
-    name: 'Activity Digital',
-    color: '#2ed573',
-    bg: 'linear-gradient(135deg, #23272b 0%, #2ed573 100%)',
-    desc: 'Fitness-focused with activity rings and metrics.',
-    votes: 48,
+    name: 'Minimalist',
+    color: '#9c27b0',
+    bg: 'linear-gradient(135deg, #23272b 0%, #9c27b0 100%)',
+    desc: 'Clean, minimal design with essential information.',
+    votes: 89,
     rank: 9,
-    category: 'Fitness',
+    category: 'Minimal',
+    source: 'Facer.io'
   },
   {
     id: 10,
-    name: 'Nike',
-    color: '#ff6b35',
-    bg: 'linear-gradient(135deg, #23272b 0%, #ff6b35 100%)',
-    desc: 'Nike-branded with bold typography and colors.',
-    votes: 45,
+    name: 'Retro Digital',
+    color: '#00bcd4',
+    bg: 'linear-gradient(135deg, #23272b 0%, #00bcd4 100%)',
+    desc: 'Vintage digital watch aesthetic with modern features.',
+    votes: 67,
     rank: 10,
-    category: 'Sports',
+    category: 'Retro',
+    source: 'Facer.io'
   },
   {
     id: 11,
-    name: 'Hermès',
-    color: '#8b4513',
-    bg: 'linear-gradient(135deg, #23272b 0%, #8b4513 100%)',
-    desc: 'Luxury leather-inspired with elegant complications.',
-    votes: 42,
+    name: 'Weather Pro',
+    color: '#2196f3',
+    bg: 'linear-gradient(135deg, #23272b 0%, #2196f3 100%)',
+    desc: 'Weather-focused with detailed forecasts and conditions.',
+    votes: 78,
     rank: 11,
-    category: 'Luxury',
+    category: 'Weather',
+    source: 'Facer.io'
   },
   {
     id: 12,
-    name: 'Memoji',
-    color: '#ff69b4',
-    bg: 'linear-gradient(135deg, #23272b 0%, #ff69b4 100%)',
-    desc: 'Personalized with animated Memoji characters.',
-    votes: 38,
+    name: 'Gaming',
+    color: '#ff5722',
+    bg: 'linear-gradient(135deg, #23272b 0%, #ff5722 100%)',
+    desc: 'Gaming-inspired with pixel art and neon effects.',
+    votes: 92,
     rank: 12,
-    category: 'Personal',
-  },
+    category: 'Gaming',
+    source: 'Facer.io'
+  }
 ];
 
 export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuccess, activeTab, setActiveTab, showDashboard, onDashboardClose }) {
-  const { t, lang, switchLang } = useLanguage();
-  const { mode, toggleTheme } = useThemeMode();
   const theme = useTheme();
   const isLight = theme.palette.mode === 'light';
   
@@ -213,30 +197,30 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
   // Функция за генериране на икони според името на темата
   function getThemeIcon(themeName, color) {
     switch (themeName) {
-      case 'Wayfinder':
-        return <WayfinderFacePreview size={160} />;
-      case 'Modular':
-        return <ModularFacePreview size={160} />;
-      case 'Infograph':
+      case 'Infograph Modular':
         return <DonutLarge sx={{ fontSize: 60, color: color }} />;
-      case 'Bevel':
-        return <Diamond sx={{ fontSize: 60, color: color }} />;
       case 'California':
         return <Watch sx={{ fontSize: 60, color: color }} />;
-      case 'Siri':
-        return <Speed sx={{ fontSize: 60, color: color }} />;
       case 'Solar':
         return <Brightness7 sx={{ fontSize: 60, color: color }} />;
       case 'Chronograph':
         return <TableChart sx={{ fontSize: 60, color: color }} />;
       case 'Activity Digital':
         return <TrendingUp sx={{ fontSize: 60, color: color }} />;
-      case 'Nike':
+      case 'Memoji':
+        return <People sx={{ fontSize: 60, color: color }} />;
+      case 'Nike Digital':
         return <Speed sx={{ fontSize: 60, color: color }} />;
       case 'Hermès':
         return <Diamond sx={{ fontSize: 60, color: color }} />;
-      case 'Memoji':
-        return <People sx={{ fontSize: 60, color: color }} />;
+      case 'Minimalist':
+        return <Watch sx={{ fontSize: 60, color: color }} />;
+      case 'Retro Digital':
+        return <TableChart sx={{ fontSize: 60, color: color }} />;
+      case 'Weather Pro':
+        return <Brightness7 sx={{ fontSize: 60, color: color }} />;
+      case 'Gaming':
+        return <Speed sx={{ fontSize: 60, color: color }} />;
       default:
         return <Watch sx={{ fontSize: 60, color: color }} />;
     }
@@ -272,89 +256,7 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
         return watchThemes;
     }
   };
-  const [stats, setStats] = useState({
-    projects: 12,
-    teamMembers: 8,
-    revenue: 125000,
-    growth: 23.5,
-  });
 
-  const [activities] = useState([
-    {
-      id: 1,
-      type: 'deploy',
-      message: 'Frontend deployed to production',
-      time: '2 minutes ago',
-      icon: <Code color="success" />,
-    },
-    {
-      id: 2,
-      type: 'commit',
-      message: 'Added new authentication features',
-      time: '15 minutes ago',
-      icon: <Code color="primary" />,
-    },
-    {
-      id: 3,
-      type: 'team',
-      message: 'New team member joined',
-      time: '1 hour ago',
-      icon: <People color="secondary" />,
-    },
-    {
-      id: 4,
-      type: 'milestone',
-      message: 'Project milestone achieved',
-      time: '2 hours ago',
-      icon: <CheckCircle color="success" />,
-    },
-  ]);
-
-
-
-  const [complications] = useState([
-    {
-      icon: <Speed />,
-      value: '2.4s',
-      label: 'Load Time',
-      color: '#00d4ff',
-      subtitle: 'Avg'
-    },
-    {
-      icon: <Battery90 />,
-      value: '94%',
-      label: 'Uptime',
-      color: '#4ecdc4',
-      subtitle: 'This Week'
-    },
-    {
-      icon: <Wifi />,
-      value: '1.2k',
-      label: 'Requests',
-      color: '#ff9500',
-      subtitle: 'Per Hour'
-    },
-    {
-      icon: <SignalCellular4Bar />,
-      value: '99.9%',
-      label: 'Success',
-      color: '#af52de',
-      subtitle: 'Rate'
-    }
-  ]);
-
-  const chartData = [
-    { name: 'Jan', users: 400, revenue: 2400 },
-    { name: 'Feb', users: 300, revenue: 1398 },
-    { name: 'Mar', users: 200, revenue: 9800 },
-    { name: 'Apr', users: 278, revenue: 3908 },
-    { name: 'May', users: 189, revenue: 4800 },
-    { name: 'Jun', users: 239, revenue: 3800 },
-  ];
-
-
-
-  const isLoggedIn = !!(user && user.email);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -472,7 +374,10 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
               {activeTab === 1 && (
                 <Box>
                   <Typography variant="h6" sx={{ mb: 2, color: 'text.primary', fontWeight: 600 }}>
-                    All Apple Watch Themes
+                    Top Apple Watch Themes from WCH App & Facer.io
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 3, color: 'text.secondary', opacity: 0.8 }}>
+                    Discover the most popular watch faces from <a href="https://wchapp.com/" target="_blank" rel="noopener noreferrer" style={{ color: '#00d4ff', textDecoration: 'none' }}>WCH App</a> and <a href="https://www.facer.io/" target="_blank" rel="noopener noreferrer" style={{ color: '#ff5722', textDecoration: 'none' }}>Facer.io</a> - the ultimate smartwatch customization platforms
                   </Typography>
                   <Box sx={{
                     display: 'grid',
@@ -522,6 +427,29 @@ export default function TechDashboard({ user, onLogout, onUserUpdate, onLoginSuc
                           }}
                         >
                           #{theme.rank}
+                        </Box>
+                        
+                        {/* Source Badge */}
+                        <Box
+                          sx={{
+                            position: 'absolute',
+                            top: 12,
+                            left: 12,
+                            px: 1.5,
+                            py: 0.5,
+                            borderRadius: 2,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            background: theme.source === 'WCH App' ? 'rgba(0, 212, 255, 0.2)' : 'rgba(255, 87, 34, 0.2)',
+                            border: `1px solid ${theme.source === 'WCH App' ? '#00d4ff' : '#ff5722'}`,
+                            color: theme.source === 'WCH App' ? '#00d4ff' : '#ff5722',
+                            fontWeight: 600,
+                            fontSize: '0.7rem',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          {theme.source}
                         </Box>
                         
                         {theme.icon}

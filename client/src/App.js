@@ -1,13 +1,9 @@
 import React, { useState, useEffect, createContext, useContext } from "react";
-import { ThemeProvider, createTheme, CssBaseline, Box, Tabs, Tab, IconButton, Tooltip, Typography, Button, Avatar, Menu, MenuItem } from "@mui/material";
-import RegisterForm from "./components/RegisterForm";
-import LoginForm from "./components/LoginForm";
-import Dashboard from "./components/Dashboard";
-import TechDashboard from "./components/TechDashboard";
-import { Language, Brightness4, Brightness7, Login, Logout, Dashboard as DashboardIcon, Person } from "@mui/icons-material";
+import { ThemeProvider, createTheme, CssBaseline, Box, IconButton, Tooltip, Typography, Button, Avatar, Menu, MenuItem } from "@mui/material";
+import { Language, Brightness4, Brightness7, Login, Logout, Dashboard as DashboardIcon } from "@mui/icons-material";
 import { LanguageProvider, useLanguage } from "./LanguageContext";
-import { techTheme } from "./theme/techTheme";
 import { watchTheme } from "./theme/watchTheme";
+import TechDashboard from "./components/TechDashboard";
 
 // Theme context
 const ThemeModeContext = createContext({ mode: "light", toggleTheme: () => {} });
@@ -41,10 +37,6 @@ function AppContent({ themeMode, toggleTheme }) {
       setUser(JSON.parse(userData));
     }
   }, []);
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
-  };
 
   const handleLoginSuccess = (userData) => {
     setIsLoggedIn(true);
