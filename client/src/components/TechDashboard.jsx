@@ -22,8 +22,6 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
-import WayfinderFacePreview from './WayfinderFacePreview';
-import ModularFacePreview from './ModularFacePreview';
 import ThemeRankingChart from './ThemeRankingChart';
 import AuthModal from './AuthModal';
 import Dashboard from './Dashboard';

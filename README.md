@@ -228,15 +228,15 @@ This application showcases watch faces from the most popular Apple Watch customi
 
 > **Add your screenshots to the `client/public/screenshots/` folder and rename them if needed.**
 
-### Login/Register (BG)
+### Login/Register 
 ![Login/Register BG](client/public/screenshots/login-bg.png)
 
-### Dashboard (BG)
+### Dashboard 
 ![Dashboard BG](client/public/screenshots/dashboard-bg.png)
 
-[//]: # (### Login/Register &#40;EN&#41;)
+### Settings 
+![Settings](client/public/screenshots/settings.png)
 
-[//]: # (![Login/Register EN]&#40;client/public/screenshots/login-en.png&#41;)
 
 [//]: # ()
 [//]: # (### Dashboard &#40;EN&#41;)
